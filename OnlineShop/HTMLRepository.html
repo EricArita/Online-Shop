@@ -1,0 +1,118 @@
+﻿<div class="header_slide">
+    <div class="header_bottom_left">
+        <div class="categories">
+            @{
+            Html.RenderAction("ProductCategory", "Product");
+            }
+        </div>
+    </div>
+    <div class="header_bottom_right">
+        <div class="slider">
+            <div id="slider">
+                <div id="mover">
+                    @foreach (var item in slides)
+                    {
+                    <div class="slide">
+                        <div class="slider-img">
+                            <a href="@item.Link"><img src="@item.Image" alt="learn more" /></a>
+                        </div>
+                        <div class="slider-text">
+                            <h1>Clearance<br><span>SALE</span></h1>
+                            <h2>UPTo 20% OFF</h2>
+                            <div class="features_list">
+                                <h4>Get to Know More About Our Memorable Services Lorem Ipsum is simply dummy text</h4>
+                            </div>
+                            <a href="preview.html" class="button">Shop Now</a>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                    }
+
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+
+<div class="content">
+    <div class="content_top">
+        <div class="heading">
+            <h3>Sản phẩm mới</h3>
+        </div>
+        <div class="see">
+            <p><a href="/san-pham">See all Products</a></p>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="section group">
+        @foreach (var item in listNewProducts)
+        {
+        var url = "/chi-tiet/" + item.MetaTitle + "-" + item.ID;
+        <div class="grid_1_of_4 images_1_of_4">
+            <a href="@url"><img src="@item.Image" alt="@item.Name" /></a>
+            <h2>@item.Name</h2>
+            <div class="price-details">
+                <div class="price-number">
+                    <p><span class="rupees">@(item.Price.HasValue ? item.Price.Value.ToString("N0") : "Liên hệ")</span></p>
+                </div>
+                <div class="add-cart">
+                    <h4><a href="/them-gio-hang?productId=@item.ID&quantity=1">Thêm vào giỏ</a></h4>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        }
+    </div>
+    <div class="content_bottom">
+        <div class="heading">
+            <h3>Sản phẩm hot</h3>
+        </div>
+        <div class="see">
+            <p><a href="/san-pham">Xem tất cả</a></p>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="section group">
+        @//foreach (var item in listFeatureProducts)
+        {
+        var url = "/chi-tiet/" + item.MetaTitle + "-" + item.ID;
+        <div class="grid_1_of_4 images_1_of_4">
+            <a href="@url"><img src="@item.Image" alt="@item.Name" /></a>
+            <h2>@item.Name</h2>
+            <div class="price-details">
+                <div class="price-number">
+                    <p><span class="rupees">@(item.Price.HasValue ? item.Price.Value.ToString("N0") : "Liên hệ")</span></p>
+                </div>
+                <div class="add-cart">
+                    <h4><a href="/them-gio-hang?productId=@item.ID&quantity=1">Thêm vào giỏ</a></h4>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+<!--
+ @foreach (var item in Model.Where(x => x.ParentID == null))
+ {
+        var child = Model.Where(x => x.ParentID == item.ID);
+        var parentClass = child.Count() > 0 ? "class=dropdown-toggle data-toggle=dropdown" : "";
+        <li class="dropdown">
+            <a href="/san-pham/@item.MetaTitle-@item.ID" @parentClass>@item.Name</a>
+            @if (child.Count() > 0)
+            {
+            <ul class="dropdown-menu">
+                @foreach (var childItem in child)
+                {
+                <li><a href="/san-pham/@childItem.MetaTitle-@childItem.ID">@childItem.Name</a></li>
+                }
+
+            </ul>
+            }
+
+        </li>
+ }
+ -->
