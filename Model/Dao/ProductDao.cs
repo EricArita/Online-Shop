@@ -63,8 +63,8 @@ namespace Model.Dao
                              Price = a.Price
                          }).AsEnumerable().Select(x => new ProductViewModel()
                          {
-                             CateMetaTitle = x.MetaTitle,
-                             CateName = x.Name,
+                             CateMetaTitle = x.CateMetaTitle,
+                             CateName = x.CateName,
                              CreatedDate = x.CreatedDate,
                              ID = x.ID,
                              Images = x.Images,

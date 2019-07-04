@@ -1,6 +1,4 @@
-﻿using Model.Dao;
-using OnlineShop.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,21 +8,26 @@ using Model.EF;
 using Common;
 using System.Configuration;
 using System.IO;
+using Model.Dao;
+using OnlineShop.Models;
 
 namespace OnlineShop.Controllers
 {
     public class CartController : Controller
     {
         private const string CartSession = "CartSession";
+       
         // GET: Cart
         public ActionResult Index()
         {
             var cart = Session[CartSession];
             var list = new List<CartItem>();
+
             if (cart != null)
             {
                 list = (List<CartItem>)cart;
             }
+
             return View(list);
         }
 
@@ -42,11 +45,13 @@ namespace OnlineShop.Controllers
             var sessionCart = (List<CartItem>)Session[CartSession];
             sessionCart.RemoveAll(x => x.Product.ID == id);
             Session[CartSession] = sessionCart;
+
             return Json(new
             {
                 status = true
             });
         }
+
         public JsonResult Update(string cartModel)
         {
             var jsonCart = new JavaScriptSerializer().Deserialize<List<CartItem>>(cartModel);
@@ -60,110 +65,116 @@ namespace OnlineShop.Controllers
                     item.Quantity = jsonItem.Quantity;
                 }
             }
+
             Session[CartSession] = sessionCart;
+
             return Json(new
             {
                 status = true
             });
         }
+
         public ActionResult AddItem(long productId, int quantity)
         {
             var product = new ProductDao().ViewDetail(productId);
             var cart = Session[CartSession];
+
             if (cart != null)
             {
                 var list = (List<CartItem>)cart;
-                if (list.Exists(x => x.Product.ID == productId))
-                {
+                var productItem = list.FirstOrDefault(p => p.Product.ID == productId);
 
-                    foreach (var item in list)
-                    {
-                        if (item.Product.ID == productId)
-                        {
-                            item.Quantity += quantity;
-                        }
-                    }
+                if (productItem != null)
+                {
+                    productItem.Quantity += quantity;
                 }
                 else
                 {
-                    //tạo mới đối tượng cart item
+                    //Create new cart item
                     var item = new CartItem();
                     item.Product = product;
                     item.Quantity = quantity;
                     list.Add(item);
                 }
-                //Gán vào session
+      
                 Session[CartSession] = list;
             }
             else
             {
-                //tạo mới đối tượng cart item
+                //Create new cart item
                 var item = new CartItem();
                 item.Product = product;
                 item.Quantity = quantity;
+
                 var list = new List<CartItem>();
                 list.Add(item);
-                //Gán vào session
                 Session[CartSession] = list;
             }
+
             return RedirectToAction("Index");
         }
+
         [HttpGet]
         public ActionResult Payment()
         {
             var cart = Session[CartSession];
             var list = new List<CartItem>();
+
             if (cart != null)
             {
                 list = (List<CartItem>)cart;
             }
+
             return View(list);
         }
 
         [HttpPost]
-        public ActionResult Payment(string shipName,string mobile,string address,string email)
+        public ActionResult Payment(string customerName, string mobile, string address, string email)
         {
             var order = new Order();
             order.CreatedDate = DateTime.Now;
             order.ShipAddress = address;
             order.ShipMobile = mobile;
-            order.ShipName = shipName;
+            order.ShipName = customerName;
             order.ShipEmail = email;
 
             try
             {
                 var id = new OrderDao().Insert(order);
-                var cart = (List<CartItem>)Session[CartSession];
-                var detailDao = new Model.Dao.OrderDetailDao();
+                var cartList = (List<CartItem>)Session[CartSession];
+                var orderDetailDao = new OrderDetailDao();
                 decimal total = 0;
-                foreach (var item in cart)
+
+                foreach (var item in cartList)
                 {
                     var orderDetail = new OrderDetail();
                     orderDetail.ProductID = item.Product.ID;
                     orderDetail.OrderID = id;
                     orderDetail.Price = item.Product.Price;
                     orderDetail.Quantity = item.Quantity;
-                    detailDao.Insert(orderDetail);
+
+                    orderDetailDao.Insert(orderDetail);
 
                     total += (item.Product.Price.GetValueOrDefault(0) * item.Quantity);
                 }
                 string content = System.IO.File.ReadAllText(Server.MapPath("~/assets/client/template/neworder.html"));
 
-                content = content.Replace("{{CustomerName}}", shipName);
+                content = content.Replace("{{CustomerName}}", customerName);
                 content = content.Replace("{{Phone}}", mobile);
                 content = content.Replace("{{Email}}", email);
                 content = content.Replace("{{Address}}", address);
                 content = content.Replace("{{Total}}", total.ToString("N0"));
-                var toEmail = ConfigurationManager.AppSettings["ToEmailAddress"].ToString();
+                var adminEmail = ConfigurationManager.AppSettings["ToEmailAddressOfAdmin"].ToString();
 
-                new MailHelper().SendMail(email, "Đơn hàng mới từ OnlineShop", content);
-                new MailHelper().SendMail(toEmail, "Đơn hàng mới từ OnlineShop", content);
+                new MailHelper().SendMail(email, "Đơn hàng mới từ Shoppee", content); //for customer
+                new MailHelper().SendMail(adminEmail, "Đơn hàng mới từ Shoppee", content); //for admin
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
                 //ghi log
                 return Redirect("/loi-thanh-toan");
             }
+
             return Redirect("/hoan-thanh");
         }
 

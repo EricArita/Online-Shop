@@ -12,7 +12,7 @@
         $('#btnUpdate').off('click').on('click', function () {
             var listProduct = $('.txtQuantity');
             var cartList = [];
-            $.each(listProduct, function (i, item) {
+            $.each(listProduct, function (index, item) {
                 cartList.push({
                     Quantity: $(item).val(),
                     Product: {
@@ -35,8 +35,6 @@
         });
 
         $('#btnDeleteAll').off('click').on('click', function () {
-
-
             $.ajax({
                 url: '/Cart/DeleteAll',
                 dataType: 'json',

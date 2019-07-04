@@ -6,7 +6,7 @@
         $('.btn-active').off('click').on('click', function (e) {
             e.preventDefault();
             var btn = $(this);
-            var id = btn.data('id');
+            var id = $(this).data('id');
             $.ajax({
                 url: "/Admin/User/ChangeStatus",
                 data: { id: id },

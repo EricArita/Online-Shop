@@ -32,7 +32,7 @@ namespace OnlineShop.Controllers
             },JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Category(long cateId, int page = 1, int pageSize = 1)
+        public ActionResult Category(long cateId, int page = 1, int pageSize = 2)
         {
             var category = new CategoryDao().ViewDetail(cateId);
             ViewBag.Category = category;

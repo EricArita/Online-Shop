@@ -86,7 +86,9 @@ namespace OnlineShop.Controllers
                 user.Status = true;
                 user.Name = firstname + " " + middlename + " " + lastname;
                 user.CreatedDate = DateTime.Now;
+
                 var resultInsert = new UserDao().InsertForFacebook(user);
+
                 if (resultInsert > 0)
                 {
                     var userSession = new UserLogin();
